@@ -1,0 +1,12 @@
+uvicorn==0.23.2
+fastapi==0.95.1
+numpy==1.26.4
+pandas==2.2.1
+mysql==0.0.3 
+mysql-connector-python==8.2.0
+mysqlclient==2.2.4
+mysql.connector==2.2.9
+greenlet==3.0.3 
+sqlalchemy==2.0.29
+pymysql==1.1.0
+python-dotenv<0.22
