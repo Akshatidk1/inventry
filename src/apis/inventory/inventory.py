@@ -44,7 +44,7 @@ async def AddInventory(item: IventryRegistration, db):
     except HTTPException as http_error:
         raise http_error  
     except Exception as e:
-        print("error ", e)
+        print('Error on line {}'.format(sys.exc_info()[-1].tb_lineno), type(e).__name__, e)
         raise HTTPException(status_code=500, detail="Internal Server Error")
     
 
@@ -101,7 +101,7 @@ async def UpdateInventory(item_id: int, item: IventryRegistration, db):
     except HTTPException as http_error:
         raise http_error  
     except Exception as e:
-        print("error ", e)
+        print('Error on line {}'.format(sys.exc_info()[-1].tb_lineno), type(e).__name__, e)
         raise HTTPException(status_code=500, detail="Internal Server Error")
 
 async def DeleteInventory(item_id: int, db):
@@ -123,5 +123,17 @@ async def DeleteInventory(item_id: int, db):
     except HTTPException as http_error:
         raise http_error  
     except Exception as e:
-        print("error ", e)
+        print('Error on line {}'.format(sys.exc_info()[-1].tb_lineno), type(e).__name__, e)
         raise HTTPException(status_code=500, detail="Internal Server Error")
+
+
+def get_product_by_id(item_id: int):
+    try:
+        db = db_connect()
+        query = f"""SELECT id,name,category,price,description,quantity FROM inventory_item where id = {item_id}"""
+        df = db.fetch_df(query)
+        data = df.to_dict(orient='records')
+        return {'error':False,'data':data}
+    except Exception as e:
+        print('Error on line {}'.format(sys.exc_info()[-1].tb_lineno), type(e).__name__, e)
+        return {"error": True, 'message': f'Error: {str(e)}'}
