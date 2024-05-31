@@ -100,6 +100,8 @@ C:.
 
     The API will be available at `http://127.0.0.1:8000`.
 
+    The FastAPI Swagger UI be available at `http://127.0.0.1:8000/docs`.
+
 ## API Endpoints
 
 ### Add an Item
