@@ -1,13 +1,19 @@
 from fastapi import HTTPException, status
-from src.apis.inventory.inventory_schema import IventryRegistration
-from src.apis.DB.db_connection import *
+from src.apis.inventory.inventory_schema import IventryRegistration # import the InventoryRegistration schema
+from src.apis.DB.db_connection import * # import the database connection
 import pandas as pd
-
 
 # Logic for registering the items
 async def AddInventory(item: IventryRegistration, db):
+    """
+    Add an inventory item from the database.
+
+    :param item: The info of the inventory item to add.
+    :param db: The database connection.
+    :return: A dictionary containing a success message and the item ID.
+    """
     try:
-        print(item)
+        # Check if required fields are provided
         if not item.name:
             raise HTTPException(status_code=400, detail="Name is required")
 
@@ -20,16 +26,18 @@ async def AddInventory(item: IventryRegistration, db):
             raise HTTPException(
                 status_code=400, detail="Price not provided"
             )
+
         if not item.currency:
             raise HTTPException(
                 status_code=400, detail="Currency not provided"
             )
 
-        
+        # Check if item already exists
         existing_user = db.execute_query("SELECT * FROM inventory_item WHERE name = %s", (item.name,))
         if existing_user:
             raise HTTPException(status_code=400, detail="Item already exists")
 
+        # Insert the item into the database
         sql = "INSERT INTO inventory_item (name, category, price, quantity, description, currency) VALUES (%s, %s, %s, %s, %s, %s)"
         val = (item.name, item.category, item.price, item.quantity, item.description, item.currency)
         db.execute_query(sql, val)
@@ -46,9 +54,13 @@ async def AddInventory(item: IventryRegistration, db):
     except Exception as e:
         print('Error on line {}'.format(sys.exc_info()[-1].tb_lineno), type(e).__name__, e)
         raise HTTPException(status_code=500, detail="Internal Server Error")
-    
 
+# Function to get all products
 def get_all_product():
+    """
+    Get All Product.
+    :return: A dictionary containing all product available.
+    """
     try:
         db = db_connect()
         query = """SELECT id,name,category,price,description,quantity FROM inventory_item"""
@@ -58,10 +70,19 @@ def get_all_product():
     except Exception as e:
         print('Error on line {}'.format(sys.exc_info()[-1].tb_lineno), type(e).__name__, e)
         return {"error": True, 'message': f'Error: {str(e)}'}
-    
 
+# Logic for updating the items
 async def UpdateInventory(item_id: int, item: IventryRegistration, db):
+    """
+    Update an inventory item from the database.
+
+    :param item_id: The ID of the inventory item to update.
+    :param item: The info of the inventory item to update.
+    :param db: The database connection.
+    :return: A dictionary containing a success message and the item ID.
+    """
     try:
+        # Check if required fields are provided
         if not item.name:
             raise HTTPException(status_code=400, detail="Name is required")
 
@@ -74,15 +95,18 @@ async def UpdateInventory(item_id: int, item: IventryRegistration, db):
             raise HTTPException(
                 status_code=400, detail="Price not provided"
             )
+
         if not item.currency:
             raise HTTPException(
                 status_code=400, detail="Currency not provided"
             )
 
+        # Check if item exists
         existing_item = db.execute_query("SELECT * FROM inventory_item WHERE id = %s", (item_id,))
         if not existing_item:
             raise HTTPException(status_code=404, detail="Item not found")
 
+        # Update the item in the database
         sql = """
             UPDATE inventory_item 
             SET name = %s, category = %s, price = %s, quantity = %s, description = %s, currency = %s 
@@ -103,13 +127,23 @@ async def UpdateInventory(item_id: int, item: IventryRegistration, db):
     except Exception as e:
         print('Error on line {}'.format(sys.exc_info()[-1].tb_lineno), type(e).__name__, e)
         raise HTTPException(status_code=500, detail="Internal Server Error")
+    
+# Logic for deleting the items
+async def delete_inventory(item_id: int, db):
+    """
+    Delete an inventory item from the database.
 
-async def DeleteInventory(item_id: int, db):
+    :param item_id: The ID of the inventory item to delete.
+    :param db: The database connection.
+    :return: A dictionary containing a success message and the item ID.
+    """
     try:
+        # Check if item exists
         existing_item = db.execute_query("SELECT * FROM inventory_item WHERE id = %s", (item_id,))
         if not existing_item:
             raise HTTPException(status_code=404, detail="Item not found")
 
+        # Delete the item from the database
         sql = "DELETE FROM inventory_item WHERE id = %s"
         db.execute_query(sql, (item_id,))
         db.commit()
@@ -123,11 +157,18 @@ async def DeleteInventory(item_id: int, db):
     except HTTPException as http_error:
         raise http_error  
     except Exception as e:
-        print('Error on line {}'.format(sys.exc_info()[-1].tb_lineno), type(e).__name__, e)
+        # Log the error and raise an internal server error
+        print(f"Error on line {sys.exc_info()[-1].tb_lineno}: {type(e).__name__}: {e}")
         raise HTTPException(status_code=500, detail="Internal Server Error")
 
-
+# Function to get a product by ID
 def get_product_by_id(item_id: int):
+    """
+    Get an inventory item by ID from the database.
+
+    :param item_id: The ID of the inventory item to retrieve.
+    :return: A dictionary containing the item details or an error message.
+    """
     try:
         db = db_connect()
         query = f"""SELECT id,name,category,price,description,quantity FROM inventory_item where id = {item_id}"""
@@ -135,5 +176,6 @@ def get_product_by_id(item_id: int):
         data = df.to_dict(orient='records')
         return {'error':False,'data':data}
     except Exception as e:
-        print('Error on line {}'.format(sys.exc_info()[-1].tb_lineno), type(e).__name__, e)
+        # Log the error and return an error message
+        print(f"Error on line {sys.exc_info()[-1].tb_lineno}: {type(e).__name__}: {e}")
         return {"error": True, 'message': f'Error: {str(e)}'}
