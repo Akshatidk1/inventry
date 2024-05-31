@@ -69,18 +69,17 @@ C:.
     pip install -r requirements.txt
     ```
 
-4. **Run the database migrations** (if applicable):
+4. **Update database connection details**:
 
-    ```bash
-    alembic upgrade head
-    ```
+    Modify the database connection details in `src/apis/DB/db_connection.py` to match your database configuration.
+
 
 ## Running the Application
 
 1. **Run the FastAPI application**:
 
     ```bash
-    uvicorn src.routers.inventory:router --reload
+    uvicorn main:app --reload
     ```
 
     The API will be available at `http://127.0.0.1:8000`.
