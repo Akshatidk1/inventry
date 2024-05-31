@@ -13,7 +13,7 @@ async def register_endpoint(user: IventryRegistration):
     # Call the AddInventory function to add the item to the inventory
     return await AddInventory(user,db)
 
-@router.post("/getAllItems",tags=['Inventory'])
+@router.get("/getAllItems",tags=['Inventory'])
 async def get_all():
     try:
         # Call the get_all_product function to retrieve all items in the inventory
@@ -23,19 +23,19 @@ async def get_all():
         print('Error on line {}'.format(sys.exc_info()[-1].tb_lineno), type(e).__name__, e)
         return {"error": True, 'message': f'Error: {str(e)}'}
 
-@router.post("/updateItem",tags=['Inventory'])
+@router.put("/updateItem",tags=['Inventory'])
 async def updade_endpoint(item_id: int, item: IventryRegistration):
     # Connect to the database
     db = db_connect()
     # Call the UpdateInventory function to update the item in the inventory
     return await UpdateInventory(item_id,item,db)
 
-@router.post("/deleteItem",tags=['Inventory'])
+@router.delete("/deleteItem",tags=['Inventory'])
 async def delete_endpoint(item_id: int):
     # Connect to the database
     db = db_connect()
     # Call the DeleteInventory function to delete the item from the inventory
-    return await DeleteInventory(item_id,db)
+    return await delete_inventory(item_id,db)
 
 @router.post("/getItem",tags=['Inventory'])
 async def get_product(item_id: int):

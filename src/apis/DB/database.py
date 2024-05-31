@@ -63,7 +63,3 @@ def create_user_table():
         print(f"An error occurred while creating the table: {err}")
 
 
-create_database_users()
-create_user_table()
-def get_db_connection():
-    return db_connect()
