@@ -114,20 +114,20 @@ C:.
 ### Get All Items
 
 - **URL**: `/getAllItems`
-- **Method**: `POST`
+- **Method**: `GET`
 - **Response**: JSON array of all items
 
 ### Update an Item by ID
 
 - **URL**: `/updateItem`
-- **Method**: `POST`
+- **Method**: `UPDATE`
 - **Body**: JSON representation of the item to be updated and its ID
 - **Response**: JSON representation of the updated item
 
 ### Delete an Item by ID
 
 - **URL**: `/deleteItem`
-- **Method**: `POST`
+- **Method**: `DELETE`
 - **Body**: JSON representation of the item ID to be deleted
 - **Response**: Success message
 
